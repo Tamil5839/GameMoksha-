@@ -1,69 +1,77 @@
-import Image from "next/image";
+import Link from "next/link";
+import { Logo, Lotus } from "@/components/brand/Lotus";
+import { DiceIcon, LadderIcon, SnakeIcon } from "@/components/icons";
+import { getPlayer } from "@/server/session";
 
-export default function Home() {
+const STEPS = [
+  {
+    icon: <LadderIcon className="h-6 w-6" />,
+    title: "Paint your board",
+    body: "Pick 3–6 good habits to be your ladders and 3–6 bad habits to be your snakes.",
+  },
+  {
+    icon: <DiceIcon className="h-6 w-6" />,
+    title: "Check in once a day",
+    body: "Tell the board what you really did, then roll. Showing up always moves you forward.",
+  },
+  {
+    icon: <SnakeIcon className="h-6 w-6" />,
+    title: "Climb to Moksha",
+    body: "Good habits climb, bad habits slide. Reach square 100 within your 30-day season.",
+  },
+];
+
+export default async function LandingPage() {
+  const player = await getPlayer();
+  const cta = player ? { href: "/board", label: "Continue your journey" } : { href: "/login", label: "Start your season" };
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+    <main className="mx-auto flex min-h-dvh max-w-xl flex-col px-4 pb-10">
+      <header className="flex items-center justify-between py-4">
+        <Logo />
+        <Link href={player ? "/board" : "/login"} className="text-sm font-semibold text-vermilion underline-offset-4 hover:underline">
+          {player ? "My board" : "Sign in"}
+        </Link>
+      </header>
+
+      <section className="mt-6 text-center">
+        <Lotus className="mx-auto h-24 w-24 drop-shadow-sm" />
+        <p className="eyebrow mt-4">Snakes &amp; Ladders, as it began</p>
+        <h1 className="mt-2 font-display text-4xl leading-tight text-ink sm:text-5xl">Your habits are the ladders and the snakes.</h1>
+      </section>
+
+      <section className="card mt-8 p-5 text-[1.05rem] leading-relaxed">
+        <p>
+          Snakes and Ladders began in India as <strong>Moksha Patam</strong>, a game about karma. Its ladders were virtues
+          like generosity and faith that lifted you towards the sky; its snakes were vices like anger and greed that pulled
+          you back down. The last square was <em>moksha</em>: freedom.
+        </p>
+        <p className="mt-3">
+          Here, your good habits are the ladders and your bad habits are the snakes. You have 30 days to reach Moksha.
+        </p>
+      </section>
+
+      <ol className="mt-6 space-y-3">
+        {STEPS.map((step, i) => (
+          <li key={step.title} className="card flex items-start gap-4 p-4">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-turmeric/30 text-vermilion">
+              {step.icon}
+            </span>
+            <div>
+              <p className="font-display text-lg leading-snug">
+                {i + 1}. {step.title}
+              </p>
+              <p className="text-ink-soft">{step.body}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+
+      <div className="sticky bottom-4 mt-8">
+        <Link href={cta.href} className="btn btn-primary w-full text-lg">
+          {cta.label}
+        </Link>
+      </div>
+    </main>
   );
 }
