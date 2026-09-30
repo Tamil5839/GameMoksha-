@@ -125,3 +125,9 @@ export function habitAmount(habit: Habit, allHabits: readonly Habit[], rules: Ga
   const scoring = habit.kind === "good" ? rules.ladders : rules.snakes;
   return habitAmounts(scoring, sameKind.length)[index];
 }
+
+/** Board order: good habits by slot, then bad habits by slot. */
+export function sortHabits<T extends Habit>(habits: readonly T[]): T[] {
+  const rank = (h: Habit) => (h.kind === "good" ? 0 : 100) + h.slot;
+  return [...habits].sort((a, b) => rank(a) - rank(b));
+}
