@@ -324,6 +324,7 @@ describe("loadShareCard", () => {
     });
     // Day 1: 1 +2 dice +3 = 6. Day 2: +2 dice = 8, +3 = 11, +3 = 14, −6 = 8.
     expect(card?.square).toBe(8);
+    expect(card?.habits.map((h) => h.amount)).toEqual([3, 3, 2, 6, 6, 6]);
   });
 
   it("only shows the player's own seasons", async () => {

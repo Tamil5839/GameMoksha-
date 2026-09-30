@@ -1,7 +1,28 @@
 import Link from "next/link";
+import { BOARD_VIEWBOX, BoardArt, type BoardHabit } from "@/components/board/BoardArt";
+import { PawnGlyph } from "@/components/board/Pawn";
 import { Logo, Lotus } from "@/components/brand/Lotus";
+import { squareCenter } from "@/domain";
 import { DiceIcon, LadderIcon, SnakeIcon } from "@/components/icons";
 import { getPlayer } from "@/server/session";
+
+const SAMPLE: BoardHabit[] = [
+  ...["Went to the gym", "Read 20 pages", "Slept before 11"].map((label, slot) => ({
+    id: `g${slot}`,
+    kind: "good" as const,
+    label,
+    slot,
+    amount: [3, 3, 2][slot],
+  })),
+  ...["Scrolled reels 2+ hours", "Skipped workout", "Stayed up past 1am"].map((label, slot) => ({
+    id: `b${slot}`,
+    kind: "bad" as const,
+    label,
+    slot,
+    amount: 6,
+  })),
+];
+const SAMPLE_PAWN = squareCenter(47);
 
 const STEPS = [
   {
@@ -40,7 +61,19 @@ export default async function LandingPage() {
         <h1 className="mt-2 font-display text-4xl leading-tight text-ink sm:text-5xl">Your habits are the ladders and the snakes.</h1>
       </section>
 
-      <section className="card mt-8 p-5 text-[1.05rem] leading-relaxed">
+      <figure className="mt-8">
+        <svg viewBox={BOARD_VIEWBOX} className="h-auto w-full" role="img" aria-label="A sample Moksha Patam board with habits as ladders and snakes">
+          <BoardArt habits={SAMPLE} id="sample" />
+          <g transform={`translate(${SAMPLE_PAWN.x} ${SAMPLE_PAWN.y})`}>
+            <PawnGlyph />
+          </g>
+        </svg>
+        <figcaption className="mt-2 text-center text-sm text-ink-soft">
+          A sample board. Yours is painted with your own habits.
+        </figcaption>
+      </figure>
+
+      <section className="card mt-6 p-5 text-[1.05rem] leading-relaxed">
         <p>
           Snakes and Ladders began in India as <strong>Moksha Patam</strong>, a game about karma. Its ladders were virtues
           like generosity and faith that lifted you towards the sky; its snakes were vices like anger and greed that pulled

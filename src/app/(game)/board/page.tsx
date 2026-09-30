@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { loadBoard, movesOfCheckIn } from "@/application";
 import { PlayArea, type PlayStatus } from "@/components/board/PlayArea";
+import { ShareButton } from "@/components/share/ShareButton";
 import { DaySquarePill, PageHeader } from "@/components/shell/PageHeader";
 import { gameDeps } from "@/server/game";
 import { requirePlayer } from "@/server/session";
@@ -51,6 +52,7 @@ export default async function BoardPage({ searchParams }: PageProps<"/board">) {
         today={today}
         wonOnDay={season.wonOnDay}
         onCheckIn={checkInAction}
+        shareButton={<ShareButton seasonId={season.id} day={board.day} square={season.currentSquare} />}
       />
     </>
   );

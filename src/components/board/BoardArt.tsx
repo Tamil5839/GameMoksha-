@@ -10,8 +10,9 @@ import {
   type Habit,
   type Point,
 } from "@/domain";
-import { BOARD_COLORS as C, snakeColors, squareTint } from "./palette";
-import { gridLines, ladderShape, shortLabel, snakeOutline, snakeShape } from "./shapes";
+import { BOARD_COLORS as C, squareTint } from "./palette";
+import { gridPrims, ladderPrims, mokshaLotusPrims, snakePrims, type Prim } from "./primitives";
+import { shortLabel } from "./shapes";
 
 /** The frame adds a painted band around the 1000×1000 board. */
 export const BOARD_VIEWBOX = "-40 -40 1080 1080";
@@ -21,8 +22,28 @@ export interface BoardHabit extends Habit {
   readonly amount: number;
 }
 
-const GRID = gridLines();
-const PETAL = "M0 -34 C9 -22 9 -6 0 6 C-9 -6 -9 -22 0 -34 Z";
+const GRID = gridPrims();
+const LOTUS = mokshaLotusPrims();
+
+/** Renders drawing primitives (shared with the share-card image). */
+export function Prims({ prims }: { prims: readonly Prim[] }) {
+  return (
+    <>
+      {prims.map((p, i) => (
+        <path
+          key={i}
+          d={p.d}
+          fill={p.fill ?? "none"}
+          stroke={p.stroke}
+          strokeWidth={p.strokeWidth}
+          strokeDasharray={p.dash}
+          opacity={p.opacity}
+          transform={p.transform}
+        />
+      ))}
+    </>
+  );
+}
 
 function Frame({ id }: { id: string }) {
   return (
@@ -37,20 +58,6 @@ function Frame({ id }: { id: string }) {
       <rect x={-40} y={-40} width={1080} height={1080} rx={26} fill={C.frame} />
       <rect x={-30} y={-30} width={1060} height={1060} rx={18} fill={`url(#${id}-band)`} />
       <rect x={-8} y={-8} width={1016} height={1016} rx={6} fill={C.frame} />
-    </g>
-  );
-}
-
-function LotusGlyph({ x, y, scale = 1 }: { x: number; y: number; scale?: number }) {
-  return (
-    <g transform={`translate(${x} ${y}) scale(${scale})`} stroke="#93301f" strokeWidth={2.5} strokeLinejoin="round">
-      {[-62, 62].map((a) => (
-        <path key={a} d={PETAL} fill="#f4b983" transform={`rotate(${a} 0 6)`} />
-      ))}
-      {[-31, 31].map((a) => (
-        <path key={a} d={PETAL} fill="#e8793f" transform={`rotate(${a} 0 6)`} />
-      ))}
-      <path d={PETAL} fill="#c2412b" />
     </g>
   );
 }
@@ -75,7 +82,7 @@ function Squares() {
           );
         })}
       </g>
-      <LotusGlyph x={squareCenter(FINAL_SQUARE).x + 8} y={squareCenter(FINAL_SQUARE).y + 6} scale={0.95} />
+      <Prims prims={LOTUS} />
       <text
         x={squareCenter(FINAL_SQUARE).x}
         y={squareOrigin(FINAL_SQUARE).y + 92}
@@ -96,73 +103,32 @@ function Squares() {
       >
         Start
       </text>
-      <g stroke={C.grid} strokeWidth={3} fill="none" strokeLinecap="round" opacity={0.75}>
-        {GRID.map((d, i) => (
-          <path key={i} d={d} />
-        ))}
-      </g>
+      <Prims prims={GRID} />
     </g>
   );
 }
 
-export function PaintedLadder({ foot, top, glow = false }: { foot: Point; top: Point; glow?: boolean }) {
-  const { rails, rungs } = ladderShape(foot, top, 34, 40);
-  return (
-    <g strokeLinecap="round" fill="none">
-      {glow ? (
-        <path d={`M${foot.x} ${foot.y} L${top.x} ${top.y}`} stroke={C.ladderGlow} strokeWidth={78} opacity={0.6} />
-      ) : null}
-      {[...rails, ...rungs].map((d, i) => (
-        <path key={`o${i}`} d={d} stroke="#4a2c10" strokeWidth={i < 2 ? 12 : 9} />
-      ))}
-      {rungs.map((d, i) => (
-        <path key={`r${i}`} d={d} stroke={C.bambooLight} strokeWidth={5} />
-      ))}
-      {rails.map((d, i) => (
-        <g key={`b${i}`}>
-          <path d={d} stroke={C.bamboo} strokeWidth={7.5} />
-          <path d={d} stroke="#5a3712" strokeWidth={7.5} strokeDasharray="3 44" />
-        </g>
-      ))}
-    </g>
-  );
+/** Where a habit's plaque sits: at the ladder's foot, or just below the snake's head. */
+export function plaqueAnchor(kind: Habit["kind"], at: Point): Point {
+  return kind === "good" ? { x: at.x, y: at.y + 26 } : { x: at.x, y: at.y + 40 };
 }
 
-export function PaintedSnake({ head, tail, slot, glow = false }: { head: Point; tail: Point; slot: number; glow?: boolean }) {
-  const shape = snakeShape(head, tail);
-  const colors = snakeColors(slot);
-  const outline = snakeOutline(shape.points, 32, 6);
-  return (
-    <g>
-      {glow ? (
-        <path d={shape.body} stroke="#f08a6c" strokeWidth={74} opacity={0.5} fill="none" strokeLinecap="round" />
-      ) : null}
-      <path d={outline} fill={colors.body} stroke={colors.belly} strokeWidth={4} strokeLinejoin="round" />
-      <path d={shape.body} fill="none" stroke={colors.spots} strokeWidth={7} strokeDasharray="3 17" strokeLinecap="round" />
-      <g transform={`translate(${shape.head.x} ${shape.head.y}) rotate(${shape.headAngle}) scale(1.15)`}>
-        <path d="M34 0 L50 0 M50 0 L57 -6 M50 0 L57 6" stroke="#c2412b" strokeWidth={3.5} strokeLinecap="round" />
-        <path
-          d="M-10 -18 C12 -24 34 -12 36 0 C34 12 12 24 -10 18 C-4 8 -4 -8 -10 -18 Z"
-          fill={colors.body}
-          stroke={colors.belly}
-          strokeWidth={4}
-        />
-        <circle cx={15} cy={-9} r={5.5} fill="#fff8e7" />
-        <circle cx={16.5} cy={-9} r={2.8} fill="#1a0f08" />
-        <circle cx={15} cy={9} r={5.5} fill="#fff8e7" />
-        <circle cx={16.5} cy={9} r={2.8} fill="#1a0f08" />
-      </g>
-    </g>
-  );
+/** Plaque width in board units, and the label shown on it. */
+export function plaqueLayout(habit: BoardHabit) {
+  const text = shortLabel(habit.label, 15);
+  const width = Math.min(300, [...text].length * 13.5 + 70);
+  return { text, width, badge: `${habit.kind === "good" ? "+" : "−"}${habit.amount}` };
+}
+
+/** Keeps a plaque inside the board. */
+export function clampPlaqueX(x: number, width: number): number {
+  return Math.min(Math.max(x, width / 2 + 6), BOARD_SIZE - width / 2 - 6);
 }
 
 function Plaque({ at, habit }: { at: Point; habit: BoardHabit }) {
-  const text = shortLabel(habit.label, 15);
-  const good = habit.kind === "good";
-  const badge = `${good ? "+" : "−"}${habit.amount}`;
-  const width = Math.min(300, [...text].length * 13.5 + 70);
-  const x = Math.min(Math.max(at.x, width / 2 + 6), BOARD_SIZE - width / 2 - 6);
-  const color = good ? C.good : C.bad;
+  const { text, width, badge } = plaqueLayout(habit);
+  const x = clampPlaqueX(at.x, width);
+  const color = habit.kind === "good" ? C.good : C.bad;
   return (
     <g transform={`translate(${x} ${at.y})`}>
       <title>{`${habit.label} (${badge})`}</title>
@@ -194,29 +160,24 @@ export function BoardArt({
   const { ladders, snakes } = paintBoard(habits);
   const byId = new Map(habits.map((h) => [h.id, h]));
   return (
-    <g>
+    <g strokeLinecap="round" strokeLinejoin="round">
       <Frame id={id} />
       <Squares />
       {ladders.map((l) => (
-        <PaintedLadder key={l.habit.id} foot={squareCenter(l.from)} top={squareCenter(l.to)} glow={highlight === l.habit.id} />
+        <Prims key={l.habit.id} prims={ladderPrims(squareCenter(l.from), squareCenter(l.to), highlight === l.habit.id)} />
       ))}
       {snakes.map((s) => (
-        <PaintedSnake
+        <Prims
           key={s.habit.id}
-          head={squareCenter(s.head)}
-          tail={squareCenter(s.tail)}
-          slot={s.habit.slot}
-          glow={highlight === s.habit.id}
+          prims={snakePrims(squareCenter(s.head), squareCenter(s.tail), s.habit.slot, highlight === s.habit.id)}
         />
       ))}
-      {ladders.map((l) => {
-        const foot = squareCenter(l.from);
-        return <Plaque key={l.habit.id} at={{ x: foot.x, y: foot.y + 26 }} habit={byId.get(l.habit.id)!} />;
-      })}
-      {snakes.map((s) => {
-        const head = squareCenter(s.head);
-        return <Plaque key={s.habit.id} at={{ x: head.x, y: head.y + 40 }} habit={byId.get(s.habit.id)!} />;
-      })}
+      {ladders.map((l) => (
+        <Plaque key={l.habit.id} at={plaqueAnchor("good", squareCenter(l.from))} habit={byId.get(l.habit.id)!} />
+      ))}
+      {snakes.map((s) => (
+        <Plaque key={s.habit.id} at={plaqueAnchor("bad", squareCenter(s.head))} habit={byId.get(s.habit.id)!} />
+      ))}
     </g>
   );
 }

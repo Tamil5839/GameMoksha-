@@ -280,7 +280,8 @@ export interface ShareCardData {
   readonly day: number;
   readonly square: number;
   readonly won: boolean;
-  readonly habits: readonly Habit[];
+  /** Every habit with its ladder or snake length, to label the board. */
+  readonly habits: readonly (Habit & { readonly amount: number })[];
   readonly biggestLadder: { readonly label: string; readonly squares: number } | null;
   readonly biggestSnake: { readonly label: string; readonly squares: number } | null;
 }
@@ -296,7 +297,7 @@ export async function loadShareCard(deps: GameDeps, userId: string, seasonId: st
     day: view.day,
     square: season.currentSquare,
     won: season.status === "won",
-    habits: season.habits,
+    habits: season.habits.map((h) => ({ ...h, amount: view.amounts[h.id] })),
     biggestLadder: summary(view.biggestLadder),
     biggestSnake: summary(view.biggestSnake),
   };
