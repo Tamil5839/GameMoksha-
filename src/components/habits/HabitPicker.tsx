@@ -53,12 +53,15 @@ export function HabitPicker({
   initialBad = [],
   submitLabel,
   footerNote,
+  aboveNav = false,
 }: {
   action: Action;
   initialGood?: readonly string[];
   initialBad?: readonly string[];
   submitLabel: string;
   footerNote?: ReactNode;
+  /** Sit above the bottom tab bar instead of at the very bottom. */
+  aboveNav?: boolean;
 }) {
   const [picked, setPicked] = useState<Record<HabitKind, string[]>>({ good: [...initialGood], bad: [...initialBad] });
   const [state, formAction, pending] = useActionState(action, {});
@@ -82,7 +85,7 @@ export function HabitPicker({
   const serverProblems = state.problems?.length ? state.problems : state.message ? [state.message] : [];
 
   return (
-    <form action={formAction} className="pb-36">
+    <form action={formAction} className={aboveNav ? "pb-44" : "pb-36"}>
       <input type="hidden" name="timeZone" value={timeZone} />
       {picked.good.map((label) => (
         <input key={`g-${label}`} type="hidden" name="good" value={label} />
@@ -103,7 +106,11 @@ export function HabitPicker({
         />
       ))}
 
-      <div className="fixed inset-x-0 bottom-0 z-20 border-t border-gold/40 bg-paper/95 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur">
+      <div
+        className={`fixed inset-x-0 z-20 border-t border-gold/40 bg-paper/95 px-4 pt-3 backdrop-blur ${
+          aboveNav ? "bottom-[calc(4rem+env(safe-area-inset-bottom))] pb-3" : "bottom-0 pb-[max(1rem,env(safe-area-inset-bottom))]"
+        }`}
+      >
         <div className="mx-auto max-w-xl">
           {serverProblems.length > 0 ? (
             <ul role="alert" className="mb-2 text-sm text-maroon">

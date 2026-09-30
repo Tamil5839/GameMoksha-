@@ -291,7 +291,8 @@ describe("loadHistory", () => {
       [2, "missed", null],
       [3, "checked-in", 8],
     ]);
-    expect(history[1]).toMatchObject({ checkedInDays: 2, missedDays: 1 });
+    expect(history[1]).toMatchObject({ checkedInDays: 2, missedDays: 1, day: 4 });
+    expect(history[0].day).toBe(1);
   });
 
   it("is empty for a new player", async () => {

@@ -237,6 +237,8 @@ export function movesOfCheckIn(checkIn: CheckInRecord): Move[] {
 export interface SeasonHistory {
   readonly season: SeasonRecord;
   readonly phase: SeasonPhase;
+  /** Day shown for the season (today's day, capped to the season). */
+  readonly day: number;
   /** Every day so far, oldest first, including missed days. */
   readonly days: readonly TimelineDay<CheckInRecord>[];
   readonly checkedInDays: number;
@@ -263,6 +265,7 @@ export async function loadHistory(deps: GameDeps, userId: string): Promise<Seaso
     return {
       season,
       phase: seasonPhase(calendar, today),
+      day: displayDay(calendar, today),
       days,
       checkedInDays: days.filter((d) => d.state === "checked-in").length,
       missedDays: days.filter((d) => d.state === "missed").length,
