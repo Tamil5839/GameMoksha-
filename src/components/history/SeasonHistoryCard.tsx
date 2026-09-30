@@ -101,8 +101,8 @@ export function SeasonHistoryCard({ history, open }: { history: SeasonHistory; o
           </p>
           <p className="mt-1 text-sm">
             <strong className="tabular-nums">Square {season.currentSquare}</strong>
-            <span className="text-ink-soft"> of {FINAL_SQUARE}</span> · {history.checkedInDays} check-ins ·{" "}
-            {history.missedDays} missed
+            <span className="text-ink-soft"> of {FINAL_SQUARE}</span> · {history.checkedInDays} check-in
+            {history.checkedInDays === 1 ? "" : "s"} · {history.missedDays} missed
           </p>
         </div>
         <span aria-hidden className="text-2xl text-ink-soft transition-transform group-open:rotate-180">

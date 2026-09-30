@@ -24,11 +24,16 @@ export function Lotus({ className, title }: { className?: string; title?: string
   );
 }
 
-export function Logo({ className = "" }: { className?: string }) {
+/** Lotus plus name; with `compact`, the name is hidden on very narrow phones. */
+export function Logo({ className = "", compact = false }: { className?: string; compact?: boolean }) {
   return (
     <span className={`inline-flex items-center gap-2 ${className}`}>
-      <Lotus className="h-8 w-8" />
-      <span className="font-display text-xl leading-none text-ink">Moksha Patam</span>
+      <Lotus className="h-8 w-8 shrink-0" />
+      <span
+        className={`whitespace-nowrap font-display text-xl leading-none text-ink ${compact ? "hidden min-[380px]:inline" : ""}`}
+      >
+        Moksha Patam
+      </span>
     </span>
   );
 }
