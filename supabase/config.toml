@@ -1,0 +1,17 @@
+# Supabase CLI settings for local development: `npx supabase start`.
+# Only the settings this app needs; everything else uses the CLI defaults.
+project_id = "moksha-patam"
+
+[auth]
+site_url = "http://localhost:3000"
+additional_redirect_urls = ["http://localhost:3000/auth/confirm", "http://127.0.0.1:3000/auth/confirm"]
+
+# New players get the "confirmation" email, returning players the "magic_link" one.
+# Both use a link that works on any device and include a one-time code.
+[auth.email.template.magic_link]
+subject = "Your Moksha Patam sign-in link"
+content_path = "./supabase/templates/magic-link.html"
+
+[auth.email.template.confirmation]
+subject = "Your Moksha Patam sign-in link"
+content_path = "./supabase/templates/magic-link.html"
