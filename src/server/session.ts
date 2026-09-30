@@ -12,8 +12,10 @@ export interface Player {
 
 /** The signed-in player for this request, or null. */
 export const getPlayer = cache(async (): Promise<Player | null> => {
+  // Reading cookies first also makes every page that checks the player render per request.
+  const cookieStore = await cookies();
   if (isDemoMode()) {
-    const id = (await cookies()).get(DEMO_COOKIE)?.value;
+    const id = cookieStore.get(DEMO_COOKIE)?.value;
     return id ? { id, email: null } : null;
   }
   if (!readSupabaseEnv()) return null;

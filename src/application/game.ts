@@ -214,6 +214,24 @@ export async function checkIn(deps: GameDeps, userId: string, input: CheckInInpu
   };
 }
 
+/** Rebuilds a saved check-in's moves (dice, ladders, snakes) for replays and summaries. */
+export function movesOfCheckIn(checkIn: CheckInRecord): Move[] {
+  const applied = checkIn.habits.filter((h) => h.applied && h.fromSquare !== null && h.toSquare !== null);
+  const diceTo = applied[0]?.fromSquare ?? checkIn.endSquare;
+  return [
+    { kind: "dice", roll: checkIn.roll, from: checkIn.startSquare, to: diceTo },
+    ...applied.map(
+      (h): Move => ({
+        kind: h.kind === "good" ? "ladder" : "snake",
+        habitId: h.habitId,
+        amount: h.amount,
+        from: h.fromSquare!,
+        to: h.toSquare!,
+      }),
+    ),
+  ];
+}
+
 // ─── History ─────────────────────────────────────────────────────────────────
 
 export interface SeasonHistory {

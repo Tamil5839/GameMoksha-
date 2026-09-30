@@ -5,6 +5,7 @@ import {
   loadBoard,
   loadHistory,
   loadShareCard,
+  movesOfCheckIn,
   startSeason,
   type GameDeps,
   type SeasonRecord,
@@ -158,6 +159,16 @@ describe("checkIn", () => {
       fromSquare: null,
     });
     expect((await repo.getSeason(USER, season.id))?.currentSquare).toBe(3);
+  });
+
+  it("can rebuild a saved check-in's moves for replays", async () => {
+    const { deps, dice, season } = await started();
+    dice.push(3);
+    const result = await checkIn(deps, USER, {
+      seasonId: season.id,
+      doneHabitIds: [habitId(season, "bad", 1), habitId(season, "good", 0)],
+    });
+    expect(movesOfCheckIn(result.checkIn)).toEqual(result.moves);
   });
 
   it("allows only one check-in per day", async () => {

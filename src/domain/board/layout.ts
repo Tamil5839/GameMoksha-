@@ -21,21 +21,21 @@ export interface SnakeSpot {
 }
 
 export const LADDER_SPOTS: readonly LadderSpot[] = [
-  { from: 4, to: 25 },
-  { from: 33, to: 54 },
-  { from: 63, to: 84 },
-  { from: 9, to: 31 },
-  { from: 42, to: 78 },
-  { from: 67, to: 93 },
+  { from: 3, to: 22 },
+  { from: 44, to: 65 },
+  { from: 73, to: 94 },
+  { from: 14, to: 33 },
+  { from: 49, to: 70 },
+  { from: 79, to: 99 },
 ];
 
 export const SNAKE_SPOTS: readonly SnakeSpot[] = [
-  { head: 47, tail: 26 },
-  { head: 76, tail: 55 },
-  { head: 97, tail: 65 },
-  { head: 38, tail: 16 },
-  { head: 29, tail: 12 },
-  { head: 89, tail: 71 },
+  { head: 36, tail: 17 },
+  { head: 67, tail: 46 },
+  { head: 97, tail: 76 },
+  { head: 30, tail: 9 },
+  { head: 62, tail: 41 },
+  { head: 92, tail: 71 },
 ];
 
 export interface PaintedLadder extends LadderSpot {
